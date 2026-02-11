@@ -16,42 +16,43 @@
             <div class="col-md-6">
                 <h2 class="mb-4 text-center">Registration Form</h2>
                 <form>
-                    <div class="row mb-3">
-                        <div class="col-6">
-                            <label for="firstName" class="form-label">First Name</label>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <input class="form-control" id="firstName" placeholder="Enter first name">
-                        </div> 
-                        <div class="col-6">
-                            <label for="lastName" class="form-label">Last Name</label>
+                        </div>
+                        <div class="col-md-6 mb-3">
+
                             <input class="form-control" id="lastName" placeholder="Enter last name">
                         </div>
                     </div>
+
                     <div class="mb-3">
-                        <label for="mobile" class="form-label">Mobile No.</label>
                         <input type="tel" class="form-control" id="mobile" placeholder="Enter mobile number">
                     </div>
+
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" placeholder="Enter email">
+                    </div>  
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <input class="form-control" id="password" placeholder="Enter password">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <input  class="form-control" id="confirmPassword" placeholder="Confirm password">
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input class="form-control" id="password" placeholder="Enter password">
-                    </div>
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Confirm Password</label>
-                        <input  class="form-control" id="confirmPassword" placeholder="Confirm password">
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="agree">
-                        <label class="form-check-label" for="agree">I agree to the terms and conditions</label>
+                    <div class="row">
+                        <div class="col-md-3 mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="agree">
+                            <label class="form-check-label" for="agree"><strong>I agree</strong></label>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-6">
                             <button type="submit" class="btn btn-primary w-100">Register</button>
                         </div>
                         <div class="col-6">
-                            <button type="button" class="btn btn-success w-100">Sign In</button>
+                            <button type="button" class="btn btn-secondary w-100">Sign In</button>
                         </div>
                     </div>
                 </form>
