@@ -1,3 +1,57 @@
 body {
   font-family: sans-serif;
 }
+
+.tweet {
+  background-color: #fff;
+  border: 1px solid #cfd9de;
+  border-radius: 16px;
+  padding: 12px;
+  display: grid;
+  width: 50%;
+  grid-template-columns: 48px 1fr;
+  gap: 12px;
+}
+
+.thumbnail {
+  border-radius: 50%;
+  grid-row: 1 / 4;
+  width: 48px;
+  height: 48px;
+}
+
+.tweet-header,
+.message,
+.actions {
+  grid-column: 2;
+}
+
+.name {
+  color: #000;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.metadata {
+  color: #71767b;
+  font-size: 15px;
+}
+
+.message {
+  color: #0f1419;
+  font-size: 15px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  max-width: 425px;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  color: #536471;
+  gap: 4px;
+}
+
