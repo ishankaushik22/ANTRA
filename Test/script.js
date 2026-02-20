@@ -1,6 +1,6 @@
 class Model {
     constructor() {
-        this.gameBoardStatus = Array(12).fill(null).map((_, index) => ({ id: index, hasMole: false }));
+        this.gameBoardStatus = Array(12).fill(null).map((_, index) => ({ id: index, hasMole: false, hasSnake: false }));
         this.score = 0;
         this.timeLeft = 30;
         this.gameInProgress = false;
@@ -9,7 +9,10 @@ class Model {
     reset() {
         this.score = 0;
         this.timeLeft = 30;
-        this.gameBoardStatus.forEach(block => block.hasMole = false);
+        this.gameBoardStatus.forEach(block => {
+            block.hasMole = false;
+            block.hasSnake = false;
+        });
         this.gameInProgress = false;
     }
 
@@ -28,6 +31,17 @@ class Model {
         if (block) {
             block.hasMole = hasMole;
         }
+    }
+
+    setSnake(id, hasSnake) {
+        const block = this.gameBoardStatus.find(b => b.id === id);
+        if (block) {
+            block.hasSnake = hasSnake;
+        }
+    }
+
+    getSnakeBlock() {
+        return this.gameBoardStatus.find(b => b.hasSnake);
     }
 
     getActiveMoles() {
@@ -62,10 +76,17 @@ class View {
         this.blocks.forEach((block, index) => {
             const blockState = boardStatus[index];
             block.innerHTML = ''; 
-            if (blockState.hasMole) {
+            if (blockState.hasSnake) {
+                const snakeImage = document.createElement('img');
+                snakeImage.src = 'images/snake.jpg';
+                snakeImage.dataset.id = index;
+                snakeImage.dataset.type = 'snake';
+                block.appendChild(snakeImage);
+            } else if (blockState.hasMole) {
                 const moleImage = document.createElement('img');
                 moleImage.src = 'images/mole.jpg';
                 moleImage.dataset.id = index;
+                moleImage.dataset.type = 'mole';
                 block.appendChild(moleImage);
             }
         });
@@ -79,14 +100,24 @@ class View {
         this.gameBoard.addEventListener('click', (e) => {
             if (e.target.matches('img')) {
                 const blockId = parseInt(e.target.dataset.id);
+                const type = e.target.dataset.type;
                 //console.log(`Block clicked: ${blockId}`);
-                handler(blockId);
+                handler({type, id: blockId});
             }
         });
     }
     
     showAlert(message) {
         alert(message);
+    }
+
+    renderSnakeGameOverBoard() {
+        this.blocks.forEach(block => {
+            block.innerHTML = '';
+            const snakeImage = document.createElement('img');
+            snakeImage.src = 'images/snake.jpg';
+            block.appendChild(snakeImage);
+        });
     }
 }
 
@@ -97,6 +128,7 @@ class Controller {
 
         this.timerId = null;
         this.moleTimerId = null;
+        this.snakeTimerId = null;
         
         this.view.bindStartGame(this.handleStartGame);
         this.view.bindBlockClick(this.handleBlockClick);
@@ -114,22 +146,30 @@ class Controller {
         if (this.model.gameInProgress) return;
 
         this.model.reset();
+        this._init();
         this.model.gameInProgress = true;
  
 
         this.timerId = setInterval(this._updateTimer, 1000);
         this.moleTimerId = setInterval(this._popMole, 1000);
+        this.snakeTimerId = setInterval(this._popSnake, 2000);
     }
     
-    handleBlockClick = (blockId) => {
+    handleBlockClick = (block) => {
         if (!this.model.gameInProgress) return;
 
-        const block = this.model.gameBoardStatus.find(b => b.id === blockId);
-        if (block && block.hasMole) {
-            this.model.incrementScore();
-            this.model.setMole(blockId, false);
-            this.view.renderScore(this.model.score);
-            this.view.renderBoard(this.model.gameBoardStatus);
+        const { type, id } = block;
+
+        if (type === 'mole') {
+            const moleBlock = this.model.gameBoardStatus.find(b => b.id === id);
+            if (moleBlock && moleBlock.hasMole) {
+                this.model.incrementScore();
+                this.model.setMole(id, false);
+                this.view.renderScore(this.model.score);
+                this.view.renderBoard(this.model.gameBoardStatus);
+            }
+        } else if (type === 'snake') {
+            this._snakeGameOver();
         }
     }
 
@@ -146,25 +186,37 @@ class Controller {
         if (this.model.getActiveMoles().length >= 3) return;
 
         const emptyBlocks = this.model.getEmptyBlocks();
-        //console.log(`Empty blocks available: ${emptyBlocks.map(b => b.id).join(', ')}`);
         const randomIndex = Math.floor(Math.random() * emptyBlocks.length);
-
-        //console.log(`Random index for mole pop: ${randomIndex}`);
-  
-
         const randomBlock = emptyBlocks[randomIndex];
-
-        //console.log(`Mole popped at block: ${randomBlock.id}`);
         this.model.setMole(randomBlock.id, true);
         this.view.renderBoard(this.model.gameBoardStatus);
+    }
+
+    _popSnake = () => {
+        const currentSnake = this.model.getSnakeBlock();
+        if(currentSnake) {
+            this.model.setSnake(currentSnake.id, false);
+        }
+        const randomIndex = Math.floor(Math.random() * this.model.gameBoardStatus.length);
+        this.model.setSnake(randomIndex, true);
+        this.view.renderBoard(this.model.gameBoardStatus);
+    }
+
+    _snakeGameOver = () => {
+        clearInterval(this.timerId);
+        clearInterval(this.moleTimerId);
+        clearInterval(this.snakeTimerId);
+        this.model.gameInProgress = false;
+        this.view.showAlert("You clicked the snake! Game Over!");
+        this.view.renderSnakeGameOverBoard();
     }
 
     _stopGame = () => {
         clearInterval(this.timerId);
         clearInterval(this.moleTimerId);
+        clearInterval(this.snakeTimerId);
         this.model.gameInProgress = false;
         this.view.showAlert("Time is Over!");
-        this.model.reset();
         this._init();
     }
 }
