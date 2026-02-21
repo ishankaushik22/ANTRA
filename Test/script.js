@@ -25,7 +25,7 @@ class Model {
     incrementScore() {
         this.score++;
     }
-
+    //SETTER FUNCTIONS
     setMole(id, hasMole) {
         const block = this.gameBoardStatus.find(b => b.id === id);
         if (block) {
@@ -39,7 +39,7 @@ class Model {
             block.hasSnake = hasSnake;
         }
     }
-
+    //GETTER FUNCTIONS
     getSnakeBlock() {
         return this.gameBoardStatus.find(b => b.hasSnake);
     }
@@ -61,9 +61,8 @@ class View {
         this.startBtn = document.querySelector('.start-game-btn');
         this.gameBoard = document.querySelector('.game-board');
         this.blocks = document.querySelectorAll('.game-board_block');
-        //console.log(this.blocks);
     }
-
+    //RENDER FUNCTIONS
     renderScore(score) {
         this.scoreEl.textContent = score;
     }
@@ -92,6 +91,15 @@ class View {
         });
     }
 
+    renderSnakeGameOverBoard() {
+        this.blocks.forEach(block => {
+            block.innerHTML = '';
+            const snakeImage = document.createElement('img');
+            snakeImage.src = 'images/snake.jpg';
+            block.appendChild(snakeImage);
+        });
+    }
+    //EVENT LISTENER FUNCTIONS
     bindStartGame(handler) {
         this.startBtn.addEventListener('click', handler);
     }
@@ -109,15 +117,6 @@ class View {
     
     showAlert(message) {
         alert(message);
-    }
-
-    renderSnakeGameOverBoard() {
-        this.blocks.forEach(block => {
-            block.innerHTML = '';
-            const snakeImage = document.createElement('img');
-            snakeImage.src = 'images/snake.jpg';
-            block.appendChild(snakeImage);
-        });
     }
 }
 
@@ -148,7 +147,6 @@ class Controller {
         this.model.reset();
         this._init();
         this.model.gameInProgress = true;
- 
 
         this.timerId = setInterval(this._updateTimer, 1000);
         this.moleTimerId = setInterval(this._popMole, 1000);
@@ -173,6 +171,7 @@ class Controller {
         }
     }
 
+    //HELPER FUNCTIONS
     _updateTimer = () => {
         this.model.decrementTime();
         this.view.renderTimer(this.model.timeLeft);
@@ -190,6 +189,15 @@ class Controller {
         const randomBlock = emptyBlocks[randomIndex];
         this.model.setMole(randomBlock.id, true);
         this.view.renderBoard(this.model.gameBoardStatus);
+        
+        //Code set for mole to disappear
+        setTimeout(() => {
+            const moleBlock = this.model.gameBoardStatus.find(b => b.id === randomBlock.id);
+            if (moleBlock && moleBlock.hasMole) {
+                this.model.setMole(randomBlock.id, false);
+                this.view.renderBoard(this.model.gameBoardStatus);
+            }
+        }, 2900);
     }
 
     _popSnake = () => {
